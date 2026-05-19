@@ -1,0 +1,14 @@
+@startuml "Use cases of the probe agent"
+    title Use cases of the probe agent
+    left to right direction
+    :User: --> (Install probe agent software)
+    :User: --> (Update probe agent software)
+    :User: --> (Connect probe to server with Wi-Fi)
+    :User: --> (Edit Wi-Fi credencials)
+    :User: --> (Connect probe to server with ethernet)
+    :User: --> (Edit Ethernet settings)
+    :User: --> (Send heartbeat to server)
+    :User: --> (Send metrics from the plugin test to server)
+    :User: --> (Change the plugins running)
+    :User: --> (Download additional plugins)
+@enduml

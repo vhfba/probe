@@ -1,0 +1,31 @@
+nl80211 is the new 802.11 netlink interface public header.
+
+Current users of nl80211: iw; crda; hostapd; wpa_supplicant (with -Dnl80211); iwd; NetworkManager (scanning etc.)
+
+some githubs
+
+Netlink Library (libnl) is the library that "Netlink is a communication mechanism between user space and the Linux kernel."
+
+Your C program → Netlink → nl80211 → Kernel → Wi-Fi hardware
+
+https://github.com/nasa/isaac/blob/master/astrobee/hardware/wifi/include/wifi/wifi.h#L2
+https://github.com/bmegli/wifi-scan/blob/master/README.md
+
+https://netdevops.it/blog/monitoring-networks-with-prometheus-and-grafana-a-complete-guide/
+
+
+to stop the tests:
+
+running
+{
+  "enabled_tests": ["wifi"]
+}
+
+stopping
+{
+  "enabled_tests": []
+}
+
+
+tornar isto package
+colocar num mirror

@@ -1,0 +1,33 @@
+@startuml "Ethernet Test"
+    title Sequence Diagram of the Ethernet Test
+    autonumber
+    autoactivate on
+    actor user as "User"
+    box "Raspberry Pi 5"
+        participant script as "Start Up Script"
+        participant py as "Python Program"
+        participant test as "Ethernet Test"
+    end box
+    box "Server"
+        participant server as "Server"
+    end box
+    user -> script : boots up device
+    script -> py : script runs the python program
+    py -> py : tries to stablish network connection through Wi-Fi/Ethernet
+    alt successful case
+        loop infinite times - 30 seconds apart
+            py -> server : sends heartbeat
+        end
+        py -> test : starts the wi-fi test compiled file
+        loop infinite times - 60 seconds apart
+            test --> py : sends the scan results with the json format 
+            py -> server : sends the metrics to server
+        end
+        py --> script : returns sucess
+        script --> user : returns sucess
+    else some kind of failure
+        py --> script : returns failure connecting to network
+        script --> user : returns failure connecting to network
+    end
+    
+@enduml

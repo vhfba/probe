@@ -1,0 +1,39 @@
+device_id: raspberrypi-001
+
+probe_name: raspberrypi-001
+
+probe_location: Building A
+
+probe_ssid: ""
+
+agent_version: 1.0.0-pi
+
+graphql_url: http://localhost:5000/graphql
+
+api_key: change-this-probe-api-key
+
+heartbeat_interval: 30
+
+metrics_interval: 60
+
+action_poll_interval: 10
+
+wifi_interface: wlan0
+
+ethernet_interface: eth0
+
+wifi_credentials:
+  ssid: ""
+  password: ""
+
+ethernet_config:
+  dhcp: false
+
+  static:
+    address: ""
+    netmask: ""
+    gateway: ""
+
+    dns:
+      - ""
+      - ""

@@ -1,0 +1,6 @@
+{
+    "id": "WIFI",
+    "version": "1.0.0",
+    "entrypoint": "./wifi_test",
+    "timeout_seconds": 20
+}
