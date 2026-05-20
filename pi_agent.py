@@ -253,7 +253,7 @@ DEFAULT_CONFIG = {
     "probe_location": "Building A",
     "probe_ssid": "",
     "agent_version": "1.0.0-pi",
-    "graphql_url": "http://localhost:5000/graphql",
+    "graphql_url": "http://172.25.20.142:5000/graphql",
     "api_key": "",
     "heartbeat_interval": 30,
     "metrics_interval": 5,
