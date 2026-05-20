@@ -1,13 +1,13 @@
 [Unit]
 Description=Beacon Probe Agent
-After=network-online.target
+After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /usr/bin/beacon-agent
+WorkingDirectory=/opt/probe
+ExecStart=/usr/bin/python3 /opt/probe/pi_agent.py
 Restart=always
 RestartSec=5
-User=root
 
 [Install]
 WantedBy=multi-user.target
