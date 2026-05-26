@@ -27,10 +27,13 @@
 struct wifi_data
 {
     int frequency;
+    int channel;
     char bssid[20];
     char ssid[33];
     int mbm;
-    int msAgo;
+    // int msAgo;
+    int connected;
+    char security[64];
 };
 
 static struct wifi_data dataResult[MAX_RESULTS];
@@ -101,6 +104,72 @@ void get_bssid(char *mac_addr, unsigned char *arg)
 {
     sprintf(mac_addr, "%02x:%02x:%02x:%02x:%02x:%02x",
             arg[0], arg[1], arg[2], arg[3], arg[4], arg[5]);
+}
+
+void parse_security(char *out, unsigned char *ie, int ielen)
+{
+    int has_wpa = 0;
+    int has_wpa2 = 0;
+    int has_wpa3 = 0;
+    int has_wep = 0;
+
+    while (ielen >= 2 && ielen >= ie[1] + 2)
+    {
+        switch (ie[0])
+        {
+        case 0x30: // RSN (WPA2/WPA3)
+            has_wpa2 = 1;
+
+            // Very rough WPA3 detection (SAE in RSN AKM)
+            for (int i = 0; i < ie[1]; i++)
+                if (ie[i] == 0x8c) // SAE AKM indicator (simplified heuristic)
+                    has_wpa3 = 1;
+            break;
+
+        case 0xdd: // WPA vendor specific
+            if (ie[1] > 4 &&
+                ie[2] == 0x00 &&
+                ie[3] == 0x50 &&
+                ie[4] == 0xF2)
+            {
+                has_wpa = 1;
+            }
+            break;
+
+        case 0x01: // WEP capability often inferred elsewhere
+            has_wep = 1;
+            break;
+        }
+
+        ielen -= ie[1] + 2;
+        ie += ie[1] + 2;
+    }
+
+    if (has_wpa3)
+        strcpy(out, "WPA3");
+    else if (has_wpa2 && has_wpa)
+        strcpy(out, "WPA/WPA2");
+    else if (has_wpa2)
+        strcpy(out, "WPA2");
+    else if (has_wpa)
+        strcpy(out, "WPA");
+    else if (has_wep)
+        strcpy(out, "WEP");
+    else
+        strcpy(out, "OPEN");
+}
+
+int freq_to_channel(int freq)
+{
+    if (freq >= 2412 && freq <= 2472)
+        return (freq - 2412) / 5 + 1; // 2.4 GHz
+    if (freq == 2484)
+        return 14;
+
+    if (freq >= 5000 && freq <= 5895)
+        return (freq - 5000) / 5; // 5 GHz (approx)
+
+    return -1;
 }
 
 void get_ssid(char *out, unsigned char *ie, int ielen)
@@ -194,10 +263,18 @@ static int callback_dump(struct nl_msg *msg, void *arg)
 
     dataResult[result_count].frequency = 0;
     dataResult[result_count].mbm = 0;
-    dataResult[result_count].msAgo = 0;
+    // dataResult[result_count].msAgo = 0;
 
     if (bss[NL80211_BSS_FREQUENCY])
+    {
         dataResult[result_count].frequency = nla_get_u32(bss[NL80211_BSS_FREQUENCY]);
+        dataResult[result_count].channel =
+            freq_to_channel(dataResult[result_count].frequency);
+    }
+    else
+    {
+        dataResult[result_count].channel = -1;
+    }
 
     get_bssid(dataResult[result_count].bssid, nla_data(bss[NL80211_BSS_BSSID]));
 
@@ -206,11 +283,16 @@ static int callback_dump(struct nl_msg *msg, void *arg)
         nla_data(bss[NL80211_BSS_INFORMATION_ELEMENTS]),
         nla_len(bss[NL80211_BSS_INFORMATION_ELEMENTS]));
 
+    parse_security(
+        dataResult[result_count].security,
+        nla_data(bss[NL80211_BSS_INFORMATION_ELEMENTS]),
+        nla_len(bss[NL80211_BSS_INFORMATION_ELEMENTS]));
+
     if (bss[NL80211_BSS_SIGNAL_MBM])
         dataResult[result_count].mbm = (int)nla_get_u32(bss[NL80211_BSS_SIGNAL_MBM]);
 
-    if (bss[NL80211_BSS_SEEN_MS_AGO])
-        dataResult[result_count].msAgo = (int)nla_get_u32(bss[NL80211_BSS_SEEN_MS_AGO]);
+    // if (bss[NL80211_BSS_SEEN_MS_AGO])
+    //     dataResult[result_count].msAgo = (int)nla_get_u32(bss[NL80211_BSS_SEEN_MS_AGO]);
 
     result_count++;
     return NL_SKIP;
@@ -356,6 +438,14 @@ void metrics(void)
 
         double signal_dbm = dataResult[i].mbm / 100.0;
 
+        /* Each AP emits 5 metric objects. All 5 are written in one block,
+           separated by commas. No trailing comma after the last object.
+           An entry-level comma is printed BEFORE each AP block (except
+           the first) so the array separator is never dangling. */
+
+        if (i > 0)
+            printf(",");
+
         printf(
             "{\"name\":\"beacon_wifi_scan_signal_dbm\","
             "\"kind\":\"gauge\","
@@ -365,23 +455,27 @@ void metrics(void)
             "\"kind\":\"gauge\","
             "\"value\":%d,"
             "\"labels\":{\"ssid\":\"%s\",\"bssid\":\"%s\"}},"
-            "{\"name\":\"beacon_wifi_scan_seen_ms_ago\","
+            "{\"name\":\"beacon_wifi_scan_channel\","
             "\"kind\":\"gauge\","
             "\"value\":%d,"
-            "\"labels\":{\"ssid\":\"%s\",\"bssid\":\"%s\"}}",
+            "\"labels\":{\"ssid\":\"%s\",\"bssid\":\"%s\"}},"
+            "{\"name\":\"beacon_wifi_scan_connected\","
+            "\"kind\":\"gauge\","
+            "\"value\":%d,"
+            "\"labels\":{\"ssid\":\"%s\",\"bssid\":\"%s\"}},"
+            "{\"name\":\"beacon_wifi_scan_security\","
+            "\"kind\":\"gauge\","
+            "\"value\":1,"
+            "\"labels\":{\"ssid\":\"%s\",\"bssid\":\"%s\",\"type\":\"%s\"}}",
             signal_dbm,
-            ssid,
-            bssid,
+            ssid, bssid, dataResult[i].frequency,
             dataResult[i].frequency,
-            dataResult[i].frequency,
-            ssid,
-            bssid,
-            dataResult[i].msAgo,
-            ssid,
-            bssid);
-
-        if (i < result_count - 1)
-            printf(",");
+            ssid, bssid,
+            dataResult[i].channel,
+            ssid, bssid,
+            dataResult[i].connected,
+            ssid, bssid,
+            ssid, bssid, dataResult[i].security);
     }
 
     printf("]}\n");

@@ -1,0 +1,6 @@
+{
+    "id": "DNS",
+    "version": "1.0.0",
+    "entrypoint": "./dns_test.py",
+    "timeout_seconds": 30
+}

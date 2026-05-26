@@ -1,7 +1,0 @@
-{
-    "id": "ethernet",
-    "version": "1.0.0",
-    "type": "binary",
-    "entrypoint": "./wifi_ethernet",
-    "timeout_seconds": 20
-}
