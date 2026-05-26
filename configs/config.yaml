@@ -8,7 +8,7 @@ probe_ssid: ""
 
 agent_version: 1.0.0-pi
 
-graphql_url: http://localhost:5000/graphql
+graphql_url: http://172.17.130.263:5000/graphql
 
 api_key: change-this-probe-api-key
 
@@ -23,8 +23,8 @@ wifi_interface: wlan0
 ethernet_interface: eth0
 
 wifi_credentials:
-  ssid: "ssid"
-  password: "password"
+  ssid: "confipp"
+  password: "conf2015"
 
 ethernet_config:
   dhcp: false

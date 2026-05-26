@@ -253,7 +253,7 @@ DEFAULT_CONFIG = {
     "probe_location": "Building A",
     "probe_ssid": "",
     "agent_version": "1.0.0-pi",
-    "graphql_url": "http://172.25.20.142:5000/graphql",
+    "graphql_url": "http://172.17.130.263:5000/graphql",
     "api_key": "",
     "heartbeat_interval": 30,
     "metrics_interval": 5,
@@ -268,12 +268,12 @@ DEFAULT_CONFIG = {
         "dhcp": True,
 
         "static": {
-            "address": "172.25.20.151",
-            "netmask": "255.255.255.0",
-            "gateway": "172.25.20.1",
+            "address": "",
+            "netmask": "",
+            "gateway": "",
             "dns": [
-                "172.25.11.5",
-                "172.25.11.6"
+                "",
+                ""
             ]
         }
     }
