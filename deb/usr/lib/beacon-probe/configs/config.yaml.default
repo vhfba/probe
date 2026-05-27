@@ -1,0 +1,32 @@
+# Beacon Probe default configuration
+# This file is copied to /etc/beacon-probe/configs/config.yaml on first install.
+# Edit that file — this one is not used directly.
+
+device_id: "raspberrypi-001"          # CHANGE: unique ID per probe
+probe_name: "raspberrypi-001"         # CHANGE: human-readable name
+probe_location: "Building A"          # CHANGE: physical location
+probe_ssid: ""
+agent_version: "1.0.0-pi"
+graphql_url: "http://172.25.20.142:5000/graphql"   # CHANGE: your server IP
+api_key: ""                           # CHANGE: set your API key
+
+heartbeat_interval: 30
+metrics_interval: 5
+action_poll_interval: 10
+
+wifi_interface: "wlan0"
+ethernet_interface: "eth0"
+
+wifi_credentials:
+  ssid: ""                            # CHANGE: wifi network name
+  password: ""                        # CHANGE: wifi password
+
+ethernet_config:
+  dhcp: true
+  static:
+    address: "172.25.20.151"
+    netmask: "255.255.255.0"
+    gateway: "172.25.20.1"
+    dns:
+      - "172.25.11.5"
+      - "172.25.11.6"

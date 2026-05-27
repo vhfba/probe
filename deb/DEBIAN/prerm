@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+systemctl stop beacon-probe.service 2>/dev/null || true
+systemctl disable beacon-probe.service 2>/dev/null || true
+
+exit 0

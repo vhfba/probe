@@ -1,0 +1,10 @@
+Package: beacon-probe
+Version: 1.0.0
+Section: net
+Priority: optional
+Architecture: arm64
+Depends: python3 (>= 3.9), python3-pip, python3-yaml, python3-requests, wpasupplicant, iproute2, iputils-ping, iw
+Maintainer: your-name <your@email.com>
+Description: Beacon network probe agent
+ Runs scheduled network measurement plugins and reports metrics
+ to the central Beacon server over GraphQL.

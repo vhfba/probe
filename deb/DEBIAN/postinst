@@ -1,0 +1,30 @@
+#!/bin/bash
+set -e
+
+# Install Python dependencies
+pip3 install requests pyyaml --break-system-packages --quiet 2>/dev/null || \
+pip3 install requests pyyaml --quiet 2>/dev/null || true
+
+# Create config directory if missing
+mkdir -p /etc/beacon-probe/configs
+mkdir -p /etc/beacon-probe/plugins
+
+# Write default config only if one doesn't exist yet
+# This preserves existing config on upgrades
+if [ ! -f /etc/beacon-probe/configs/config.yaml ]; then
+    cp /usr/lib/beacon-probe/configs/config.yaml.default /etc/beacon-probe/configs/config.yaml
+    echo "Created default config at /etc/beacon-probe/configs/config.yaml"
+    echo ">>> Edit it before starting the agent <<<"
+fi
+
+# Point pi_agent at the right config and plugin dirs via environment
+# (done via the systemd unit's EnvironmentFile, see beacon-probe.service)
+
+# Enable and start the systemd service
+systemctl daemon-reload
+systemctl enable beacon-probe.service
+
+echo "beacon-probe installed. Edit /etc/beacon-probe/configs/config.yaml then run:"
+echo "  sudo systemctl start beacon-probe"
+
+exit 0

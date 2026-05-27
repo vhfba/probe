@@ -1,0 +1,5 @@
+# Beacon Probe environment
+# These override the paths pi_agent.py uses for config and plugins.
+# Edit /etc/beacon-probe/configs/config.yaml to configure this probe.
+BEACON_CONFIG_PATH=/etc/beacon-probe/configs/config.yaml
+BEACON_PLUGIN_DIR=/etc/beacon-probe/plugins
